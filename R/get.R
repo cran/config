@@ -24,7 +24,7 @@
 #' @export
 get <- function(value = NULL,
                 config = Sys.getenv("R_CONFIG_ACTIVE", "default"),
-                file = "config.yml",
+                file = Sys.getenv("R_CONFIG_FILE", "config.yml"),
                 use_parent = TRUE) {
 
   # find the file (scan parent directories above if need be)
@@ -35,8 +35,8 @@ get <- function(value = NULL,
       file <- normalizePath(file, mustWork = FALSE)
 
       # check if we are at the end of the search
-      file_dir <- dirname(file)
-      parent_dir <- dirname(file_dir)
+      file_dir <- normalizePath(dirname(file), mustWork = FALSE)
+      parent_dir <- normalizePath(dirname(file_dir), mustWork = FALSE)
       if (file_dir == parent_dir)
         break
 
@@ -52,7 +52,9 @@ get <- function(value = NULL,
   }
 
   # load the yaml
-  config_yaml <- yaml::yaml.load_file(file)
+  config_yaml <- yaml::yaml.load_file(
+    file, handlers = list(expr = function(x) eval(parse(text = x)))
+  )
 
   # get the default config (required)
   default_config <- config_yaml[["default"]]
