@@ -1,25 +1,32 @@
 
-#' Read configuration values
+#' Read configuration values.
 #'
-#' Read from the currently active configuration, retreiving either a
+#' Read from the currently active configuration, retrieving either a
 #' single named value or all values as a list.
 #'
-#' @param value Name of value (\code{NULL} to read all values)
+#' For additional details see the package website at
+#'  \href{https://github.com/rstudio/config}{https://github.com/rstudio/config}.
+#'
+#' @param value Name of value (`NULL` to read all values)
+#'
 #' @param config Name of configuration to read from. Defaults to
-#'   the value of the \code{R_CONFIG_NAME} environment variable
+#'   the value of the `R_CONFIG_ACTIVE` environment variable
 #'   ("default" if the variable does not exist).
+#'
 #' @param file Configuration file to read from (defaults to
-#'   "config.yml"). If the file isn't found at the location
+#'   `"config.yml"`). If the file isn't found at the location
 #'   specified then parent directories are searched for a file
 #'   of the same name.
-#' @param use_parent \code{TRUE} to scan parent directories for
+#'
+#' @param use_parent `TRUE` to scan parent directories for
 #'   configuration files if the specified config file isn't found.
 #'
 #' @return The requested configuration value (or all values as
-#'   a list of \code{NULL} is passed for \code{value}).
+#'   a list of `NULL` is passed for `value`).
 #'
-#' @details For additional details see the package website at
-#'  \href{https://github.com/rstudio/config}{https://github.com/rstudio/config}.
+#' @return A list, or vector, corresponding to the contents of the config file.
+#'
+#' @seealso [is_active()], [merge()]
 #'
 #' @export
 get <- function(value = NULL,
@@ -53,7 +60,7 @@ get <- function(value = NULL,
 
   # load the yaml
   config_yaml <- yaml::yaml.load_file(
-    file, handlers = list(expr = function(x) eval(parse(text = x)))
+    file, eval.expr = FALSE, handlers = list(expr = function(x) parse(text = x))
   )
 
   # get the default config (required)
@@ -86,6 +93,20 @@ get <- function(value = NULL,
 
   # merge the specified configuration with the default configuration
   active_config <- merge_lists(default_config, do_get(config))
+
+  # check whether any expressions need to be evaluated recursively
+
+  eval_recursively <- function(x){
+    is_expr <- vapply(x, is.expression, logical(1))
+    x[is_expr] <- lapply(x[is_expr], eval, envir = baseenv())
+
+    is_list <- vapply(x, is.list, logical(1))
+    x[is_list] <- lapply(x[is_list], eval_recursively)
+
+    x
+  }
+
+  active_config <- eval_recursively(active_config)
 
   # return either the entire config or a requested value
   if (!is.null(value))
