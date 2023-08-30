@@ -1,8 +1,18 @@
 
 
-#' Merge two configurations.
+#' Merge two configurations. Always use as `config::merge()`.
 #'
 #' Merge one configuration into another recursively.
+#'
+#' @section Warning - Do not attach the package using library(config):
+#'
+#' We strongly recommend you use `config::get()` rather than attaching the
+#' package using `library(config)`.
+#'
+#' In fact, we strongly recommend you never use `library(config)`.
+#'
+#' The underlying reason is that the `get()` and `merge()` functions in
+#' `{config}` will mask these functions with the same names in base R.
 #'
 #' @param base_config Configuration to merge values into
 #'
@@ -20,7 +30,7 @@ merge <- function(base_config, merge_config) {
 
 
 
-# recursively merge two lists (extracted from code used by rmarkdown
+# Recursively merge two lists (extracted from code used by rmarkdown
 # package to merge _output.yml, _site.yml, front matter, etc.:
 # https://github.com/rstudio/rmarkdown/blob/master/R/util.R#L174)
 merge_lists <- function (base_list, overlay_list, recursive = TRUE) {

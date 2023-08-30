@@ -2,7 +2,7 @@
 % Please edit documentation in R/get.R
 \name{get}
 \alias{get}
-\title{Read configuration values.}
+\title{Read configuration values. Always use as \code{config::get()}.}
 \usage{
 get(
   value = NULL,
@@ -37,8 +37,39 @@ Read from the currently active configuration, retrieving either a
 single named value or all values as a list.
 }
 \details{
-For additional details see the package website at
-\href{https://github.com/rstudio/config}{https://github.com/rstudio/config}.
+For additional details see \url{https://rstudio.github.io/config/}.
+}
+\section{Warning - Do not attach the package using library(config)}{
+
+
+We strongly recommend you use \code{config::get()} rather than attaching the
+package using \code{library(config)}.
+
+In fact, we strongly recommend you never use \code{library(config)}.
+
+The underlying reason is that the \code{get()} and \code{merge()} functions in
+\code{{config}} will mask these functions with the same names in base R.
+}
+
+\examples{
+
+yaml <- "
+default:
+  trials: 5
+  dataset: 'data-sampled.csv'
+
+production:
+  trials: 30
+  dataset: 'data.csv'
+"
+
+get <- base::get
+
+
+
+with_config(yaml, config::get())
+with_config(yaml, config::get("trials"))
+
 }
 \seealso{
 \code{\link[=is_active]{is_active()}}, \code{\link[=merge]{merge()}}

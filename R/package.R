@@ -4,13 +4,16 @@
 #' test, production). Read values using a function that determines the current
 #' environment and returns the appropriate value.
 #'
-#' The main function is [get()]
+#' The main function is [config::get()].
 #'
-#' @details For additional details see the package website at
-#'  \href{https://github.com/rstudio/config}{https://github.com/rstudio/config}.
+#' @details For additional details see <https://rstudio.github.io/config/>.
 #'
 #' @import yaml
 #'
-#' @docType package
 #' @name config
+#' @keywords internal
+"_PACKAGE"
+
+## usethis namespace: start
+## usethis namespace: end
 NULL
